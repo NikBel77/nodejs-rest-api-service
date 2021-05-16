@@ -1,5 +1,6 @@
 const usersRepo = require('./user.memory.repository');
 const User = require('./user.model');
+const taskService = require('../tasks/task.service');
 
 class UsersService {
     constructor() {
@@ -25,18 +26,18 @@ class UsersService {
     deleteUser(id) {
         const deletedUser = this.usersStore.deleteUser(id)
         if(!deletedUser) return null;
+        taskService.removeUser(id);
         return deletedUser;
     }
 
     updateUser(id, filds) {
-        const deletedUser = this.usersStore.deleteUser(id);
-        if(!deletedUser) return null
-        const name = filds.name || deletedUser.name;
-        const login = filds.login || deletedUser.login;
-        const password = filds.password || deletedUser.password;
-        const newUser = new User({ id, name, login, password });
-        this.usersStore.addUser(newUser);
-        return newUser;
+        const user = this.usersStore.getById(id);
+        if(!user) return null;
+        Object.keys(filds).forEach((prop) => {
+            if(!filds[prop]) return;
+            user[prop] = filds[prop];
+        });
+        return user;
     }
 }
 

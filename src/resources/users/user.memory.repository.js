@@ -1,4 +1,4 @@
-class UserStore {
+class UsersStore {
     constructor() {
         this.USER_STORE = [];
     }
@@ -23,4 +23,4 @@ class UserStore {
     }
 }
 
-module.exports = new UserStore();
+module.exports = new UsersStore();

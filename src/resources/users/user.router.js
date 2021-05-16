@@ -3,7 +3,7 @@ const User = require('./user.model');
 const usersService = require('./user.service');
 
 router.route('/').get(async (req, res) => {
-    const users = await usersService.getAll();
+    const users =  usersService.getAll();
     res.json(users.map(User.toResponse));
 });
 
@@ -46,6 +46,6 @@ router.route('/:id').put(async (req, res) => {
         return
     }
     res.json(User.toResponse(deletetUser))
-})
+});
 
 module.exports = router;

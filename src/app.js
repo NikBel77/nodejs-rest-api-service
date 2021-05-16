@@ -20,7 +20,8 @@ app.use('/', (req, res, next) => {
   next();
 });
 
-app.use('/boards', boardRouter)
 app.use('/users', userRouter);
+
+app.use('/boards', boardRouter);
 
 module.exports = app;
