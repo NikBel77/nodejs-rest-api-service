@@ -1,6 +1,26 @@
-const getAll = async () => {
-  // TODO: mock implementation. should be replaced during task development
-  return [];
-};
+class UsersStore {
+    constructor() {
+        this.USER_STORE = [];
+    }
 
-module.exports = { getAll };
+    getAll() {
+        return this.USER_STORE;
+    }
+
+    getById(soughtId) {
+        return this.USER_STORE.find(({ id }) => id === soughtId) || null
+    }
+
+    addUser(user) {
+        this.USER_STORE.push(user)
+    }
+
+    deleteUser(soughtId) {
+        const user = this.getById(soughtId);
+        if(!user) return null
+        this.USER_STORE = this.USER_STORE.filter(({ id }) => user.id !== id);
+        return user
+    }
+}
+
+module.exports = new UsersStore();

@@ -1,21 +1,18 @@
 const crypto = require("crypto");
 
-class User {
+class Board {
     constructor({
         id = crypto.randomBytes(16).toString("hex"),
-        name,
-        login,
-        password,
+        title,
+        columns,
     } = {}) {
         this.id = id;
-        this.name = name;
-        this.login = login;
-        this.password = password;
+        this.title = title;
+        this.columns = columns
     }
 
-    static toResponse(user) {
-        const { id, name, login } = user;
-        return { id, name, login };
+    static toResponse(board) {
+        return board
     }
 
     static validate(...args) {
@@ -27,4 +24,4 @@ class User {
     }
 }
 
-module.exports = User;
+module.exports = Board;
