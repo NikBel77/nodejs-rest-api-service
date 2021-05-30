@@ -5,7 +5,7 @@ const Board = require('./board.model');
 
 router.route('/').get(async (req, res) => {
     const users = boardService.getAll();
-    res.json(users.map(Board.toResponse));
+    res.json(users);
 });
 
 router.route('/').post(async (req, res) => {
@@ -15,7 +15,7 @@ router.route('/').post(async (req, res) => {
         return;
     };
     const board = boardService.createBoard(title, columns);
-    res.status(201).json(Board.toResponse(board));
+    res.status(201).json(board);
 });
 
 router.route('/:id').get(async (req, res) => {
@@ -25,7 +25,7 @@ router.route('/:id').get(async (req, res) => {
         res.sendStatus(404);
         return
     }
-    res.json(Board.toResponse(board))
+    res.json(board)
 });
 
 router.route('/:id').delete(async (req, res) => {
@@ -35,7 +35,7 @@ router.route('/:id').delete(async (req, res) => {
         res.sendStatus(404);
         return
     }
-    res.status(204).json(Board.toResponse(deletedBoard))
+    res.status(204).json(deletedBoard)
 });
 
 router.route('/:id').put(async (req, res) => {
@@ -46,7 +46,7 @@ router.route('/:id').put(async (req, res) => {
         res.sendStatus(404);
         return
     }
-    res.json(Board.toResponse(deletedBoard))
+    res.json(deletedBoard)
 });
 
 router.use('/:boardId/tasks/', taskRouter)

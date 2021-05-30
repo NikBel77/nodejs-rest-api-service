@@ -1,16 +1,15 @@
 const router = require('express').Router({ mergeParams: true });
 const taskServise = require('./task.service');
-const Task = require('./task.model');
 
 router.route('/').get(async (req, res) => {
     const tasks = taskServise.getAll();
-    res.json(tasks.map(Task.toResponse));
+    res.json(tasks);
 });
 
 router.route('/').post(async (req, res) => {
     const { boardId }= req.params
     const task = taskServise.createTask({ ...req.body, boardId });
-    res.status(201).json(Task.toResponse(task));
+    res.status(201).json(task);
 });
 
 router.route('/:id').get(async (req, res) => {
@@ -20,7 +19,7 @@ router.route('/:id').get(async (req, res) => {
         res.sendStatus(404);
         return
     }
-    res.json(Task.toResponse(task));
+    res.json(task);
 });
 
 router.route('/:id').delete(async (req, res) => {
@@ -30,7 +29,7 @@ router.route('/:id').delete(async (req, res) => {
         res.sendStatus(404);
         return
     }
-    res.status(204).json(Task.toResponse(deletedTask));
+    res.status(204).json(deletedTask);
 });
 
 router.route('/:id').put(async (req, res) => {
@@ -41,7 +40,7 @@ router.route('/:id').put(async (req, res) => {
         res.sendStatus(404);
         return
     }
-    res.json(Task.toResponse(updatedTask));
+    res.json(updatedTask);
 });
 
 module.exports = router
