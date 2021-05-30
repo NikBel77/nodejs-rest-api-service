@@ -1,39 +1,39 @@
 const Task = require('./task.model');
-const tasksRepo = require('./task.memory.repository');
+const MemoryDB = require('../db/memory.db');
 
 class TasksService {
     constructor() {
-        this.tasksStore = tasksRepo;
+        this.taskDB = new MemoryDB();
     }
 
     createTask(params) {
         const task = new Task(params);
-        this.tasksStore.addTask(task);
+        this.taskDB.addItem(task);
         return task;
     }
 
     findTaskById(id) {
-        const found = this.tasksStore.getById(id);
+        const found = this.taskDB.getById(id);
         if(!found) return null;
         return found;
     }
 
     getAll() {
-        return this.tasksStore.getAll();
+        return this.taskDB.getAll();
     }
 
     deleteTask(id) {
-        const deletedTask = this.tasksStore.deleteTask(id)
+        const deletedTask = this.taskDB.deleteItemById(id)
         if(!deletedTask) return null;
         return deletedTask;
     }
 
     deleteByBoardId(boardId) {
-        this.tasksStore.deleteByBoardId(boardId);
+        this.taskDB.deleteByProp('boardId', boardId);
     }
 
     removeUser(userId) {
-        const tasks = this.tasksStore.getAll()
+        const tasks = this.taskDB.getAll()
         tasks.forEach((task, i) => {
             if(task.userId === userId) {
                 tasks[i].userId = null;
@@ -42,7 +42,7 @@ class TasksService {
     }
 
     updateTask({ id, ...filds }) {
-        const task = this.tasksStore.getById(id);
+        const task = this.taskDB.getById(id);
         if(!task) return null;
         Object.keys(filds).forEach((prop) => {
             if(!filds[prop]) return;
