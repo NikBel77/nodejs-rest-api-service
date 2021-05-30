@@ -1,6 +1,10 @@
 const Task = require('./task.model');
 const MemoryDB = require('../db/memory.db');
-
+/**
+ * UserService class.
+ * used for TaskDB management
+ * @class
+ */
 class TasksService {
     constructor() {
         this.taskDB = new MemoryDB();

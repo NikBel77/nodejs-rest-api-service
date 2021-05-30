@@ -1,7 +1,11 @@
 const Board = require('./board.model');
 const MemoryDB = require('../db/memory.db');
 const taskService = require('../tasks/task.service');
-
+/**
+ * UserService class.
+ * used for Board DB management
+ * @class
+ */
 class BoardService {
     constructor() {
         this.boardDB = new MemoryDB();
