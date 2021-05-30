@@ -50,7 +50,7 @@ class UsersService {
     /**
      * Delete User by Id from DB.
      * @param {string} id User id.
-     * @returns {(User | null)} Returns User if the user was deleted and null if not.
+     * @returns {(User | null)} Returns deleted User. if the user was deleted and null if not.
      */
     deleteUser(id) {
         const deletedUser = this.userDB.deleteItemById(id)
@@ -61,7 +61,7 @@ class UsersService {
 
     /**
      * Updates User with the specified id.
-     * @param {string} id User Id 
+     * @param {string} id User id 
      * @param {object} filds Object with filds to update.
      * @returns {User} updated User
      */
