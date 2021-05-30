@@ -31,11 +31,17 @@ class Task implements ITask {
      */
 
     public id: string;
+
     public title: string;
+
     public description: string;
+
     public userId: string | null;
+
     public order: string | null;
+
     public boardId: string;
+
     public columnId: string;
 
     constructor({

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import taskRouter from '../tasks/task.router';
 import boardService from './board.service';
 import Board from './board.model';
+
 const router = Router();
 
 router.route('/').get(async (_, res) => {
@@ -14,7 +15,7 @@ router.route('/').post(async (req, res) => {
     if(!Board.validate(title)) {
         res.sendStatus(400);
         return;
-    };
+    }
     const board = boardService.createBoard(title, columns);
     res.status(201).json(board);
 });

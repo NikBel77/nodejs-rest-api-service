@@ -39,7 +39,7 @@ class Board implements IBoard {
      * @param  {...string} args strings to validate 
      * @returns {boolean}
      */
-    static validate(...args: string[]) {
+    static validate(...args: string[]): boolean {
         return args.every((arg) => {
             if(!arg) return false;
             if(typeof arg !== 'string') return false;

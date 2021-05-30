@@ -1,5 +1,6 @@
 import express from 'express';
 import taskServise from './task.service';
+
 const router = express.Router({ mergeParams: true });
 
 interface IParams { id: string, boardId: string }

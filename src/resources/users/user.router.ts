@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import User from './user.model';
 import usersService from './user.service';
+
 const router = Router()
 
 router.route('/').get(async (_, res) => {
@@ -13,7 +14,7 @@ router.route('/').post(async (req, res) => {
     if(!User.validate(name, login, password)) {
         res.sendStatus(400);
         return;
-    };
+    }
     const user = usersService.createUser(name, login, password);
     res.status(201).json(User.toResponse(user));
 });

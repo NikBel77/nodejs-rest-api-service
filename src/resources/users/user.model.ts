@@ -24,8 +24,11 @@ class User implements IUser {
      */
 
     public id: string;
+
     public name: string;
+
     public login: string;
+
     public password: string;
 
     constructor({
@@ -45,7 +48,7 @@ class User implements IUser {
      * @param {User} user User to send.
      * @returns {{ name: string, id: string, login: string }} 
      */
-    static toResponse(user: User) {
+    static toResponse(user: User): { id: string, name: string, login: string } {
         const { id, name, login } = user;
         return { id, name, login };
     }
@@ -55,7 +58,7 @@ class User implements IUser {
      * @param  {...string} args strings to validate 
      * @returns {boolean}
      */
-    static validate(...args: string[]) {
+    static validate(...args: string[]): boolean {
         return args.every((arg) => {
             if(!arg) return false;
             if(typeof arg !== 'string') return false;
