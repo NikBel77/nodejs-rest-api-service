@@ -3,7 +3,7 @@ const taskService = require('../tasks/task.service');
 const MemoryDB = require('../db/memory.db');
 /**
  * UserService class.
- * used for User DB management
+ * User DB management.
  * @class
  */
 class UsersService {

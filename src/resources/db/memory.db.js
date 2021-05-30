@@ -21,7 +21,7 @@ class MemoryDB {
 
     /**
      * Get item by id param.
-     * @param {string} id item Id.
+     * @param {string} id item id.
      * @returns {any}
      */
     getById(id) {
@@ -30,7 +30,7 @@ class MemoryDB {
 
     /**
      * Push item to store.
-     * @param {any} item 
+     * @param {any} item Item to push.
      */
     addItem(item) {
         this.STORE.push(item);
@@ -38,7 +38,7 @@ class MemoryDB {
 
     /**
      * Remove item by id param.
-     * @param {string} id 
+     * @param {string} id Item id.
      * @returns 
      */
     deleteItemById(id) {
@@ -50,8 +50,8 @@ class MemoryDB {
 
     /**
      * Remove item by custom prop.
-     * @param {string} prop
-     * @param {string} id
+     * @param {string} prop Property to compare.
+     * @param {string} value Property value.
      */
     deleteByProp(prop, value) {
         this.STORE = this.STORE
