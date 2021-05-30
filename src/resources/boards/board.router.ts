@@ -1,9 +1,10 @@
-const router = require('express').Router();
-const taskRouter = require('../tasks/task.router');
-const boardService = require('./board.service');
-const Board = require('./board.model');
+import { Router } from 'express';
+import taskRouter from '../tasks/task.router';
+import boardService from './board.service';
+import Board from './board.model';
+const router = Router();
 
-router.route('/').get(async (req, res) => {
+router.route('/').get(async (_, res) => {
     const users = boardService.getAll();
     res.json(users);
 });
@@ -41,14 +42,14 @@ router.route('/:id').delete(async (req, res) => {
 router.route('/:id').put(async (req, res) => {
     const { id } = req.params;
     const { title, columns } = req.body
-    const deletedBoard = boardService.updateBoard(id, { title, columns });
-    if(!deletedBoard) {
+    const updated = boardService.updateBoard(id, title, columns);
+    if(!updated) {
         res.sendStatus(404);
         return
     }
-    res.json(deletedBoard)
+    res.json(updated)
 });
 
 router.use('/:boardId/tasks/', taskRouter)
 
-module.exports = router
+export default router

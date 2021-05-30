@@ -1,12 +1,15 @@
-const Board = require('./board.model');
-const MemoryDB = require('../db/memory.db');
-const taskService = require('../tasks/task.service');
+import Board, { IBoard, IColumn } from './board.model';
+import MemoryDB from '../db/memory.db';
+import taskService from '../tasks/task.service';
+
 /**
  * UserService class.
  * Board DB management.
  * @class
  */
 class BoardService {
+    private boardDB: MemoryDB<IBoard>
+
     /**
      * Create BoardService instance.
      * @constructor
@@ -21,8 +24,8 @@ class BoardService {
      * @param {Array} columns Board columns.
      * @returns {Board} new created Board instance.
      */
-    createBoard(title, columns) {
-        const board = new Board({ title, columns });
+    createBoard(title: string, columns: IColumn[]) {
+        const board = new Board(title, columns);
         this.boardDB.addItem(board);
         return board;
     }
@@ -32,7 +35,7 @@ class BoardService {
      * @param {string} id - Board id.
      * @returns {(Board | null)} Board from db or null if not finded.
      */
-    findBoardById(id) {
+    findBoardById(id: string) {
         const found = this.boardDB.getById(id);
         if(!found) return null;
         return found;
@@ -51,7 +54,7 @@ class BoardService {
      * @param {string} id Board id.
      * @returns {(Board | null)} Returns deleted Board. if the Board was deleted and null if not.
      */
-    deleteBoard(id) {
+    deleteBoard(id: string) {
         const deletedBoard = this.boardDB.deleteItemById(id);
         taskService.deleteByBoardId(id);
         if(!deletedBoard) return null;
@@ -64,15 +67,13 @@ class BoardService {
      * @param {object} filds Object represents Board Model
      * @returns {Board} updated Board
      */
-    updateBoard(id, filds) {
+    updateBoard(id: string, title: string, columns: IColumn[]) {
         const board = this.boardDB.getById(id)
         if(!board) return null
-        Object.keys(filds).forEach((prop) => {
-            if(!filds[prop]) return
-            board[prop] = filds[prop]
-        });
+        if(title) board.title = title;
+        if(columns) board.columns = columns;
         return board
     }
 }
 
-module.exports = new BoardService();
+export default new BoardService();

@@ -1,12 +1,15 @@
-const User = require('./user.model');
-const taskService = require('../tasks/task.service');
-const MemoryDB = require('../db/memory.db');
+import User, { IUser } from './user.model';
+import taskService from '../tasks/task.service';
+import MemoryDB from '../db/memory.db';
+
 /**
  * UserService class.
  * User DB management.
  * @class
  */
 class UsersService {
+    private userDB: MemoryDB<IUser>
+
     /**
      * Create UserSevrice instance.
      * @constructor
@@ -22,7 +25,7 @@ class UsersService {
      * @param {string} password - Password.
      * @returns {User} new created User instance.
      */
-    createUser(name, login, password) {
+    createUser(name: string, login: string, password: string) {
         const user = new User({ name, login, password });
         this.userDB.addItem(user);
         return user;
@@ -33,7 +36,7 @@ class UsersService {
      * @param {string} id - User id.
      * @returns {(User | null)} User from db or null if not finded.
      */
-    findUserById(id) {
+    findUserById(id: string) {
         const found = this.userDB.getById(id);
         if(!found) return null;
         return found;
@@ -52,7 +55,7 @@ class UsersService {
      * @param {string} id User id.
      * @returns {(User | null)} Returns deleted User. if the user was deleted and null if not.
      */
-    deleteUser(id) {
+    deleteUser(id: string) {
         const deletedUser = this.userDB.deleteItemById(id)
         if(!deletedUser) return null;
         taskService.removeUser(id);
@@ -65,15 +68,14 @@ class UsersService {
      * @param {object} filds Object with filds to update.
      * @returns {User} updated User
      */
-    updateUser(id, filds) {
+    updateUser(id: string, { name, login, password }: { name: string, login: string, password: string}) {
         const user = this.userDB.getById(id);
         if(!user) return null;
-        Object.keys(filds).forEach((prop) => {
-            if(!filds[prop]) return;
-            user[prop] = filds[prop];
-        });
+        if(name) user.name = name;
+        if(login) user.login = login;
+        if(password) user.password = password;
         return user;
     }
 }
 
-module.exports = new UsersService();
+export default new UsersService();

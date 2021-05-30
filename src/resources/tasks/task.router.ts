@@ -1,12 +1,15 @@
-const router = require('express').Router({ mergeParams: true });
-const taskServise = require('./task.service');
+import express from 'express';
+import taskServise from './task.service';
+const router = express.Router({ mergeParams: true });
 
-router.route('/').get(async (req, res) => {
+interface IParams { id: string, boardId: string }
+
+router.route('/').get(async (_, res) => {
     const tasks = taskServise.getAll();
     res.json(tasks);
 });
 
-router.route('/').post(async (req, res) => {
+router.route('/').post<IParams>(async (req, res) => {
     const { boardId }= req.params
     const task = taskServise.createTask({ ...req.body, boardId });
     res.status(201).json(task);
@@ -32,9 +35,10 @@ router.route('/:id').delete(async (req, res) => {
     res.status(204).json(deletedTask);
 });
 
-router.route('/:id').put(async (req, res) => {
+router.route('/:id').put<IParams>(async (req, res) => {
     const { id, boardId } = req.params;
-    const updatedTask = taskServise.updateTask({ ...req.body, id, boardId });
+    const { title, description, userId, order, columnId } = req.body
+    const updatedTask = taskServise.updateTask(id, { boardId, title, description, userId, order, columnId });
 
     if(!updatedTask) {
         res.sendStatus(404);
@@ -43,4 +47,4 @@ router.route('/:id').put(async (req, res) => {
     res.json(updatedTask);
 });
 
-module.exports = router
+export default router

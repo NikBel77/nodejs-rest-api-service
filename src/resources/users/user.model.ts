@@ -1,9 +1,18 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
+import { IdbItem } from '../db/memory.db';
+
+export interface IUser extends IdbItem {
+    id: string;
+    name: string;
+    login: string;
+    password: string;
+}
+
 /**
  * presents User model
  * @class
  */
-class User {
+class User implements IUser {
     /**
      * Create User
      * @constructor
@@ -13,15 +22,21 @@ class User {
      * @param {strign} user.login user login.
      * @param {string} user.password user password strign.
      */
+
+    public id: string;
+    public name: string;
+    public login: string;
+    public password: string;
+
     constructor({
         id = crypto.randomBytes(16).toString("hex"),
-        name,
-        login,
-        password,
-    } = {}) {
-        this.id = id;
-        this.name = name;
-        this.login = login;
+        name = 'No Name',
+        login = 'No Login',
+        password = 'password',
+    }: { [key: string]: string }) {
+        this.id = id
+        this.name = name
+        this.login = login
         this.password = password;
     }
 
@@ -30,7 +45,7 @@ class User {
      * @param {User} user User to send.
      * @returns {{ name: string, id: string, login: string }} 
      */
-    static toResponse(user) {
+    static toResponse(user: User) {
         const { id, name, login } = user;
         return { id, name, login };
     }
@@ -40,7 +55,7 @@ class User {
      * @param  {...string} args strings to validate 
      * @returns {boolean}
      */
-    static validate(...args) {
+    static validate(...args: string[]) {
         return args.every((arg) => {
             if(!arg) return false;
             if(typeof arg !== 'string') return false;
@@ -49,4 +64,4 @@ class User {
     }
 }
 
-module.exports = User;
+export default User;

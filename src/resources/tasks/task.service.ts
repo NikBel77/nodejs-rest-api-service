@@ -1,11 +1,14 @@
-const Task = require('./task.model');
-const MemoryDB = require('../db/memory.db');
+import Task, { ITask } from './task.model';
+import MemoryDB from '../db/memory.db';
+
 /**
  * UserService class.
  * Task DB management.
  * @class
  */
 class TasksService {
+    private taskDB: MemoryDB<ITask>
+
     /**
      * Create TaskService instance.
      * @constructor
@@ -19,7 +22,7 @@ class TasksService {
      * @param {object} params - Represents new Task.
      * @returns {Task} new created User instance.
      */
-    createTask(params) {
+    createTask(params: { [key: string]: string }) {
         const task = new Task(params);
         this.taskDB.addItem(task);
         return task;
@@ -30,7 +33,7 @@ class TasksService {
      * @param {string} id - Task id.
      * @returns {(Task | null)} Task from db or null if not finded.
      */
-    findTaskById(id) {
+    findTaskById(id: string) {
         const found = this.taskDB.getById(id);
         if(!found) return null;
         return found;
@@ -49,7 +52,7 @@ class TasksService {
      * @param {string} id Task id.
      * @returns {(Task | null)} Returns deleted Task. if the Task was deleted and null if not.
      */
-    deleteTask(id) {
+    deleteTask(id: string) {
         const deletedTask = this.taskDB.deleteItemById(id)
         if(!deletedTask) return null;
         return deletedTask;
@@ -59,19 +62,21 @@ class TasksService {
      * Delete all tasks whose id equals boadrId.
      * @param {string} boardId 
      */
-    deleteByBoardId(boardId) {
-        this.taskDB.deleteByProp('boardId', boardId);
+    deleteByBoardId(boardId: string) {
+        let tasks = this.taskDB.getAll()
+        tasks = tasks.filter((task) => task.boardId === boardId)
+        this.taskDB.deleteItems(tasks);
     }
 
     /**
      * Remove All Users From assignee.
      * @param {string} userId 
      */
-    removeUser(userId) {
+    removeUser(userId: string) {
         const tasks = this.taskDB.getAll()
-        tasks.forEach((task, i) => {
-            if(task.userId === userId) {
-                tasks[i].userId = null;
+        tasks.forEach((task) => {
+            if(task.userId && task.userId === userId) {
+                task.userId = null;
             }
         })
     }
@@ -81,15 +86,32 @@ class TasksService {
      * @param {Task} task Object represents Task model 
      * @returns {Task} updated Task
      */
-    updateTask({ id, ...filds }) {
+    updateTask(id: string, {
+        title,
+        description,
+        userId,
+        order,
+        boardId,
+        columnId
+    }: {
+        title: string,
+        description: string,
+        userId: string,
+        order: string,
+        boardId: string,
+        columnId: string})
+    {
         const task = this.taskDB.getById(id);
         if(!task) return null;
-        Object.keys(filds).forEach((prop) => {
-            if(!filds[prop]) return;
-            task[prop] = filds[prop];
-        });
+
+        if(title) task.title = title;
+        if(description) task.description = description;
+        if(userId) task.userId = userId;
+        if(order) task.order = order;
+        if(boardId) task.boardId = boardId;
+        if(columnId) task.columnId = columnId;
         return task;
     }
 }
 
-module.exports = new TasksService()
+export default new TasksService()

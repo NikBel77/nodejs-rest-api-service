@@ -1,24 +1,20 @@
-/**
- * Memory databse.
- * @class
- */
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 class MemoryDB {
     /**
      * Create DB instance and create store.
      * @constructor
      */
     constructor() {
-        this.STORE = []
+        this.STORE = [];
     }
-
     /**
      * Return all items from store.
-     * @returns {any[]} 
+     * @returns {any[]}
      */
     getAll() {
         return this.STORE;
     }
-
     /**
      * Get item by id param.
      * @param {string} id item id.
@@ -27,7 +23,6 @@ class MemoryDB {
     getById(id) {
         return this.STORE.find((item) => item.id === id) || null;
     }
-
     /**
      * Push item to store.
      * @param {any} item Item to push.
@@ -35,28 +30,27 @@ class MemoryDB {
     addItem(item) {
         this.STORE.push(item);
     }
-
     /**
      * Remove item by id param.
      * @param {string} id Item id.
-     * @returns 
+     * @returns
      */
     deleteItemById(id) {
         const item = this.getById(id);
-        if(!item) return false;
+        if (!item)
+            return false;
         this.STORE = this.STORE.filter((el) => el.id !== id);
         return item;
     }
-
     /**
      * Remove item by custom prop.
      * @param {string} prop Property to compare.
      * @param {string} value Property value.
      */
-    deleteByProp(prop, value) {
-        this.STORE = this.STORE
-            .filter(item => item[prop] !== value)
+    deleteItems(items) {
+        items.forEach((item) => {
+            this.STORE = this.STORE.filter((storeItem) => item !== storeItem);
+        });
     }
 }
-
-module.exports = MemoryDB
+exports.default = MemoryDB;

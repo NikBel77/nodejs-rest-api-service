@@ -9,7 +9,9 @@
   "description": "REST service starter for RS School",
   "main": "src/server.js",
   "scripts": {
-    "start": "nodemon src/server.js",
+    "start": "nodemon --watch \"./src/**\" --ext \"ts,json\" --exec \"ts-node ./src/server.ts\"",
+    "st": "node ./build/server.js",
+    "build": "tsc",
     "lint": "eslint --ext .js,.ts --fix src/",
     "test": "cross-env DEBUG=rs:* jest --testMatch \"<rootDir>/test/e2e/test/*.test.js\" --noStackTrace --runInBand",
     "test:auth": "cross-env DEBUG=rs:* TEST_MODE=auth jest --noStackTrace",
@@ -53,6 +55,9 @@
     "yamljs": "0.3.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.12",
+    "@types/swagger-ui-express": "^4.1.2",
+    "@types/yamljs": "^0.2.31",
     "chai": "4.3.4",
     "debug": "4.3.1",
     "dirty-chai": "2.0.1",
