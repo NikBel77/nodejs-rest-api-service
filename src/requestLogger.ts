@@ -3,9 +3,9 @@ import { finished } from "stream"
 
 /**
  * Logger log all requests to console
- * @param req
- * @param res
- * @param next 
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next 
  */
 export function requestLogger(req: Request, res: Response, next: NextFunction): void {
     const { method, url } = req;
@@ -15,7 +15,7 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
 
     finished(res, () => {
         const ms = Date.now() - start;
-        const { statusCode } = res
+        const { statusCode } = res;
         console.log(`${method} ${url} ${statusCode} [${ms}ms]`);
-    })    
+    });
 }

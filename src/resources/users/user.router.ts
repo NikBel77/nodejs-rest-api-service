@@ -1,6 +1,8 @@
 import { Router } from 'express';
+import { BadRequestError, NotFoundError } from '../../errorHandler';
 import User from './user.model';
 import usersService from './user.service';
+import { StatusCodes } from 'http-status-codes';
 
 const router = Router()
 
@@ -9,45 +11,35 @@ router.route('/').get(async (_, res) => {
     res.json(users.map(User.toResponse));
 });
 
-router.route('/').post(async (req, res) => {
+router.route('/').post((req, res) => {
     const { name, login, password } = req.body;
-    if(!User.validate(name, login, password)) {
-        res.sendStatus(400);
-        return;
-    }
+    if(!User.validate(name, login, password)) throw new BadRequestError(
+        `invalid one of parameters: name: ${name}, login: ${login}, password: ${password}`
+    )
     const user = usersService.createUser(name, login, password);
-    res.status(201).json(User.toResponse(user));
+    res.status(StatusCodes.CREATED).json(User.toResponse(user));
 });
 
-router.route('/:id').get(async (req, res) => {
+router.route('/:id').get((req, res) => {
     const { id } = req.params;
     const user = usersService.findUserById(id);
-    if(!user) {
-        res.sendStatus(404);
-        return
-    }
+    if(!user) throw new NotFoundError(`user with id: ${id} not found`)
     res.json(User.toResponse(user))
 });
 
-router.route('/:id').delete(async (req, res) => {
+router.route('/:id').delete((req, res) => {
     const { id } = req.params;
     const deletetUser = usersService.deleteUser(id)
-    if(!deletetUser) {
-        res.sendStatus(404);
-        return
-    }
-    res.status(204).json(User.toResponse(deletetUser))
+    if(!deletetUser) throw new NotFoundError(`user with id: ${id} not found`)
+    res.status(StatusCodes.NO_CONTENT).json(User.toResponse(deletetUser))
 });
 
-router.route('/:id').put(async (req, res) => {
+router.route('/:id').put((req, res) => {
     const { id } = req.params;
     const { name, login, password } = req.body
-    const deletetUser = usersService.updateUser(id, { name, login, password });
-    if(!deletetUser) {
-        res.sendStatus(404);
-        return
-    }
-    res.json(User.toResponse(deletetUser))
+    const updatedUser = usersService.updateUser(id, { name, login, password });
+    if(!updatedUser) throw new NotFoundError(`user with id: ${id} not found`)
+    res.json(User.toResponse(updatedUser))
 });
 
 export default router;

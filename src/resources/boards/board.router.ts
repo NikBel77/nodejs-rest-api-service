@@ -2,52 +2,43 @@ import { Router } from 'express';
 import taskRouter from '../tasks/task.router';
 import boardService from './board.service';
 import Board from './board.model';
+import { BadRequestError, NotFoundError } from '../../errorHandler';
 
 const router = Router();
 
-router.route('/').get(async (_, res) => {
+router.route('/').get((_, res) => {
     const users = boardService.getAll();
     res.json(users);
 });
 
-router.route('/').post(async (req, res) => {
+router.route('/').post((req, res) => {
     const { title, columns } = req.body;
-    if(!Board.validate(title)) {
-        res.sendStatus(400);
-        return;
-    }
+    if(!Board.validate(title)) throw new BadRequestError(`
+        invalid one of parameters: title: ${title}, columns: ${columns}
+    `)
     const board = boardService.createBoard(title, columns);
     res.status(201).json(board);
 });
 
-router.route('/:id').get(async (req, res) => {
+router.route('/:id').get((req, res) => {
     const { id } = req.params;
     const board = boardService.findBoardById(id);
-    if(!board) {
-        res.sendStatus(404);
-        return
-    }
+    if(!board) throw new NotFoundError(`border with id: ${id} not found`)
     res.json(board)
 });
 
-router.route('/:id').delete(async (req, res) => {
+router.route('/:id').delete((req, res) => {
     const { id } = req.params;
     const deletedBoard = boardService.deleteBoard(id)
-    if(!deletedBoard) {
-        res.sendStatus(404);
-        return
-    }
+    if(!deletedBoard) throw new NotFoundError(`border with id: ${id} not found`)
     res.status(204).json(deletedBoard)
 });
 
-router.route('/:id').put(async (req, res) => {
+router.route('/:id').put((req, res) => {
     const { id } = req.params;
     const { title, columns } = req.body
     const updated = boardService.updateBoard(id, title, columns);
-    if(!updated) {
-        res.sendStatus(404);
-        return
-    }
+    if(!updated) throw new NotFoundError(`border with id: ${id} not found`)
     res.json(updated)
 });
 
