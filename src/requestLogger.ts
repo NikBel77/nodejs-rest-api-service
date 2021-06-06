@@ -1,6 +1,8 @@
-import { NextFunction, Request, Response } from "express"
-import { finished } from "stream"
+import { NextFunction, Request, Response } from "express";
+import { finished } from "stream";
+import { createWriteStream } from "fs";
 
+const writeStream = createWriteStream('./logs/requests.log')
 /**
  * Logger log all requests to console
  * @param {Request} req
@@ -16,6 +18,6 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
     finished(res, () => {
         const ms = Date.now() - start;
         const { statusCode } = res;
-        console.log(`${method} ${url} ${statusCode} [${ms}ms]`);
+        writeStream.write(`${method} ${url} ${statusCode} [${ms}ms]\n`);
     });
 }

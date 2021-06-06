@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express'
-import StatusCodes from 'http-status-codes'
+import { StatusCodes } from 'http-status-codes'
+import { createWriteStream } from 'fs'
 
+const writeStream = createWriteStream('./logs/errors.log')
 /**
  * Handle custom errors
  * @param {Error} err
@@ -9,14 +11,17 @@ import StatusCodes from 'http-status-codes'
  * @param {NextFunction} next 
  */
 export default function errorHandler(
-    err: Error, _req: Request, res: Response, _next: NextFunction
+    err: Error, req: Request, res: Response, _next: NextFunction
 ): void {
     if (!(err instanceof NotFoundError) && !(err instanceof BadRequestError)) {
         // next(err)
         return
     }
-    const { message } = err
-    res.status(err.statusCode).json({ message })
+    const time = new Date()
+    const { url , method } = req
+    const { message, statusCode } = err
+    res.status(statusCode).json({ message })
+    writeStream.write(`${time.toLocaleString()} ${method} ${url} ${statusCode}\n`);
 }
 
 interface IRequestError extends Error {

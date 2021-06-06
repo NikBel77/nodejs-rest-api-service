@@ -1,6 +1,7 @@
 import express from 'express';
 import { NotFoundError } from '../../errorHandler';
 import taskServise from './task.service';
+import { StatusCodes } from 'http-status-codes';
 
 const router = express.Router({ mergeParams: true });
 
@@ -14,7 +15,7 @@ router.route('/').get((_, res) => {
 router.route('/').post<IParams>((req, res) => {
     const { boardId }= req.params
     const task = taskServise.createTask({ ...req.body, boardId });
-    res.status(201).json(task);
+    res.status(StatusCodes.CREATED).json(task);
 });
 
 router.route('/:id').get((req, res) => {
@@ -28,7 +29,7 @@ router.route('/:id').delete((req, res) => {
     const { id } = req.params;
     const deletedTask = taskServise.deleteTask(id)
     if(!deletedTask) throw new NotFoundError(`task with id: ${id} not found`)
-    res.status(204).json(deletedTask);
+    res.status(StatusCodes.NO_CONTENT).json(deletedTask);
 });
 
 router.route('/:id').put<IParams>((req, res) => {

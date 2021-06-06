@@ -3,6 +3,7 @@ import taskRouter from '../tasks/task.router';
 import boardService from './board.service';
 import Board from './board.model';
 import { BadRequestError, NotFoundError } from '../../errorHandler';
+import { StatusCodes } from 'http-status-codes';
 
 const router = Router();
 
@@ -17,7 +18,7 @@ router.route('/').post((req, res) => {
         invalid one of parameters: title: ${title}, columns: ${columns}
     `)
     const board = boardService.createBoard(title, columns);
-    res.status(201).json(board);
+    res.status(StatusCodes.CREATED).json(board);
 });
 
 router.route('/:id').get((req, res) => {
@@ -31,7 +32,7 @@ router.route('/:id').delete((req, res) => {
     const { id } = req.params;
     const deletedBoard = boardService.deleteBoard(id)
     if(!deletedBoard) throw new NotFoundError(`border with id: ${id} not found`)
-    res.status(204).json(deletedBoard)
+    res.status(StatusCodes.NO_CONTENT).json(deletedBoard)
 });
 
 router.route('/:id').put((req, res) => {
