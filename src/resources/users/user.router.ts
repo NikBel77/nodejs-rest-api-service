@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 
 const router = Router()
 
-router.route('/').get(async (_, res) => {
+router.route('/').get((_, res) => {
     const users =  usersService.getAll();
     res.json(users.map(User.toResponse));
 });

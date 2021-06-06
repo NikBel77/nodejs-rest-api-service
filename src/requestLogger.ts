@@ -1,15 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import { finished } from "stream";
-import { createWriteStream } from "fs";
+import logger from "./Logger";
 
-const writeStream = createWriteStream('./logs/requests.log')
 /**
  * Logger log all requests to console
  * @param {Request} req
  * @param {Response} res
  * @param {NextFunction} next 
  */
-export function requestLogger(req: Request, res: Response, next: NextFunction): void {
+export function requestLoggerMw(req: Request, res: Response, next: NextFunction): void {
     const { method, url } = req;
     const start: number = Date.now();
 
@@ -18,6 +17,6 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
     finished(res, () => {
         const ms = Date.now() - start;
         const { statusCode } = res;
-        writeStream.write(`${method} ${url} ${statusCode} [${ms}ms]\n`);
+        logger.writeRequest(method, url, statusCode, ms)
     });
 }
