@@ -2,12 +2,15 @@ import { createWriteStream, existsSync, mkdirSync, writeFileSync } from 'fs'
 
 class Logger {
     private dir = './log';
-    private requestsStream = createWriteStream(`${this.dir}/requests.log`);
-    private errorStream = createWriteStream(`${this.dir}/errors.log`)
-    private rejectionsStream = createWriteStream(`${this.dir}/promise-rejections.log`)
+    private requestsStream;
+    private errorStream;
+    private rejectionsStream;
 
     constructor() {
         if (!existsSync(this.dir)) mkdirSync(this.dir);
+        this.requestsStream = createWriteStream(`${this.dir}/requests.log`);
+        this.errorStream = createWriteStream(`${this.dir}/errors.log`)
+        this.rejectionsStream = createWriteStream(`${this.dir}/promise-rejections.log`)
     }
 
     logRejection(reason: string) {
