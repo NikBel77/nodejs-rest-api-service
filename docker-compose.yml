@@ -7,6 +7,8 @@ services:
             - postgres
         environment: 
             - PORT=${PORT}
+        volumes: 
+             - .:/usr/app/log
     postgres:
         build: ./database/
         ports: 
