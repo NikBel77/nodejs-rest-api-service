@@ -1,5 +1,13 @@
 # RS School REST service
 
+## Setup & run with Docker
+- install docker
+- pull 'docker' branch
+- cmd `docker compose up`
+- `ctrl + c` to stop containers
+
+Logs will be written to the log folder
+
 ## Prerequisites
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
