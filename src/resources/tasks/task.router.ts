@@ -1,44 +1,39 @@
 import express from 'express';
-import { NotFoundError } from '../../errorHandler';
 import taskServise from './task.service';
 import { StatusCodes } from 'http-status-codes';
+import routerFn from '../../utils/routerFn';
 
 const router = express.Router({ mergeParams: true });
 
-interface IParams { id: string, boardId: string }
-
-router.route('/').get((_, res) => {
-    const tasks = taskServise.getAll();
-    res.json(tasks);
-});
-
-router.route('/').post<IParams>((req, res) => {
-    const { boardId }= req.params
-    const task = taskServise.createTask({ ...req.body, boardId });
-    res.status(StatusCodes.CREATED).json(task);
-});
-
-router.route('/:id').get((req, res) => {
-    const { id } = req.params;
-    const task = taskServise.findTaskById(id);
-    if(!task) throw new NotFoundError(`task with id: ${id} not found`)
+router.route('/').get(routerFn(async (_, res) => {
+    const task = await taskServise.getAll();
     res.json(task);
-});
+}));
 
-router.route('/:id').delete((req, res) => {
+router.route('/').post(routerFn(async (req, res) => {
+    const task = await taskServise.createTask(req.body);
+    res.status(StatusCodes.CREATED).json(task);
+}));
+
+router.route('/:id').get(routerFn(async (req, res) => {
     const { id } = req.params;
-    const deletedTask = taskServise.deleteTask(id)
-    if(!deletedTask) throw new NotFoundError(`task with id: ${id} not found`)
-    res.status(StatusCodes.NO_CONTENT).json(deletedTask);
-});
+    if (!id) throw new Error('id must be provided')
+    const task = await taskServise.findTaskById(id);
+    res.json(task)
+}));
 
-router.route('/:id').put<IParams>((req, res) => {
-    const { id, boardId } = req.params;
-    const { title, description, userId, order, columnId } = req.body
-    const updatedTask = taskServise.updateTask(id, { boardId, title, description, userId, order, columnId });
+router.route('/:id').delete(routerFn(async (req, res) => {
+    const { id } = req.params;
+    if (!id) throw new Error('id must be provided')
+    const deleted = await taskServise.deleteTask(id)
+    res.status(StatusCodes.NO_CONTENT).json(deleted)
+}));
 
-    if(!updatedTask) throw new NotFoundError(`task with id: ${id} and board-id: ${boardId} not found`)
-    res.json(updatedTask);
-});
+router.route('/:id').put(routerFn(async (req, res) => {
+    const { id } = req.params;
+    if (!id) throw new Error('id must be provided')
+    const isUpdated = await taskServise.updateTask(id, req.body);
+    res.json({ updated: isUpdated })
+}));
 
 export default router

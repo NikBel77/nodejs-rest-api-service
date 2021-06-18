@@ -1,47 +1,43 @@
 import { Router } from 'express';
 import taskRouter from '../tasks/task.router';
 import boardService from './board.service';
-import Board from './board.model';
-import { BadRequestError, NotFoundError } from '../../errorHandler';
 import { StatusCodes } from 'http-status-codes';
+import routerFn from '../../utils/routerFn';
 
 const router = Router();
 
-router.route('/').get((_, res) => {
-    const users = boardService.getAll();
-    res.json(users);
-});
+router.route('/').get(routerFn(async (_, res) => {
+    const boards = await boardService.getAll();
+    res.json(boards);
+}));
 
-router.route('/').post((req, res) => {
-    const { title, columns } = req.body;
-    if(!Board.validate(title)) throw new BadRequestError(`
-        invalid one of parameters: title: ${title}, columns: ${columns}
-    `)
-    const board = boardService.createBoard(title, columns);
+router.route('/').post(routerFn(async (req, res) => {
+    console.log('created')
+    
+    const board = await boardService.createBoard(req.body);
     res.status(StatusCodes.CREATED).json(board);
-});
+}));
 
-router.route('/:id').get((req, res) => {
+router.route('/:id').get(routerFn(async (req, res) => {
     const { id } = req.params;
-    const board = boardService.findBoardById(id);
-    if(!board) throw new NotFoundError(`border with id: ${id} not found`)
+    if (!id) throw new Error('id must be provided')
+    const board = await boardService.findBoardById(id);
     res.json(board)
-});
+}));
 
-router.route('/:id').delete((req, res) => {
+router.route('/:id').delete(routerFn(async (req, res) => {
     const { id } = req.params;
-    const deletedBoard = boardService.deleteBoard(id)
-    if(!deletedBoard) throw new NotFoundError(`border with id: ${id} not found`)
-    res.status(StatusCodes.NO_CONTENT).json(deletedBoard)
-});
+    if (!id) throw new Error('id must be provided')
+    const deleted = await boardService.deleteBoard(id)
+    res.status(StatusCodes.NO_CONTENT).json(deleted)
+}));
 
-router.route('/:id').put((req, res) => {
+router.route('/:id').put(routerFn(async (req, res) => {
     const { id } = req.params;
-    const { title, columns } = req.body
-    const updated = boardService.updateBoard(id, title, columns);
-    if(!updated) throw new NotFoundError(`border with id: ${id} not found`)
-    res.json(updated)
-});
+    if (!id) throw new Error('id must be provided')
+    const isUpdated = await boardService.updateBoard(id, req.body);
+    res.json({ updated: isUpdated })
+}));
 
 router.use('/:boardId/tasks/', taskRouter)
 

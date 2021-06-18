@@ -1,78 +1,84 @@
-import Board, { IBoard, IColumn } from './board.model';
-import MemoryDB from '../db/memory.db';
-import taskService from '../tasks/task.service';
+import { Board } from '../../entities/Board';
+import { getRepository } from 'typeorm';
+import { BadRequestError, NotFoundError } from '../../middleware/errorHandler';
 
 /**
- * UserService class.
+ * BoardService class.
  * Board DB management.
  * @class
  */
 class BoardService {
-    private boardDB: MemoryDB<IBoard>
-
     /**
-     * Create BoardService instance.
-     * @constructor
+     * get Repo
+     * @returns {Repository<Board>}
      */
-    constructor() {
-        this.boardDB = new MemoryDB();
+    get repo() {
+        return getRepository(Board)
     }
 
-    /**
-     * Create new Board and push to DB.
-     * @param {string} title - Board title.
-     * @param {Array} columns Board columns.
+     /**
+     * Create new Board and add to DB.
+     * @async
+     * @param {Partial<Board>} dto - Board dto.
      * @returns {Board} new created Board instance.
      */
-    createBoard(title: string, columns: IColumn[]) {
-        const board = new Board(title, columns);
-        this.boardDB.addItem(board);
-        return board;
+    async createBoard(dto: Partial<Board>) {
+        try {
+            dto.columns = JSON.stringify(dto.columns)
+            const board = this.repo.create(dto)
+            await board.save()
+            return board;
+        } catch {            
+            throw new BadRequestError('One of parameters missing');
+        }
     }
-
+    
     /**
      * Find Board By Id.
-     * @param {string} id - Board id.
-     * @returns {(Board | null)} Board from db or null if not finded.
+     * @async
+     * @param {string} id - Task id.
+     * @returns {Board} Task from db.
      */
-    findBoardById(id: string) {
-        const found = this.boardDB.getById(id);
-        if(!found) return null;
-        return found;
+    async findBoardById(id: string) {
+        const board = await this.repo.findOne(id)
+        if(!board) throw new NotFoundError(`Board with id - ${id} not found`)
+        return { ...board, columns: board.columns };
     }
 
     /**
-     * Get all boards from DB.
-     * @returns {Board[]} Board Array.
+     * Get all Boards from DB.
+     * @async
+     * @returns {Board[]} Users Array.
      */
-    getAll() {
-        return this.boardDB.getAll();
+    async getAll() {
+        const boards = await this.repo.find()
+        return boards
     }
 
     /**
      * Delete Board by Id from DB.
+     * @async
      * @param {string} id Board id.
-     * @returns {(Board | null)} Returns deleted Board. if the Board was deleted and null if not.
+     * @returns {Board} Returns deleted Board.
      */
-    deleteBoard(id: string) {
-        const deletedBoard = this.boardDB.deleteItemById(id);
-        taskService.deleteByBoardId(id);
-        if(!deletedBoard) return null;
-        return deletedBoard;
+    async deleteBoard(id: string) {
+        const board = await this.repo.findOne(id)
+        if(!board) throw new NotFoundError(`Board with id - ${id} not found`)
+        await board.remove()
+        return board
     }
 
     /**
      * Updates Board with the specified id.
-     * @param {string} id Board id
-     * @param {object} filds Object represents Board Model
-     * @returns {Board} updated Board
+     * @async
+     * @param {string} id Board id 
+     * @param {Partial<Board>} dto Object with filds to update.
+     * @returns {boolean} is Board been updated
      */
-    updateBoard(id: string, title: string, columns: IColumn[]) {
-        const board = this.boardDB.getById(id)
-        if(!board) return null
-        if(title) board.title = title;
-        if(columns) board.columns = columns;
-        return board
+    async updateBoard(id: string, dto: Partial<Board>) {
+        const affected = (await this.repo.update(id, dto)).affected
+        if(!affected) throw new BadRequestError('To many parameters or id not found')
+        return true
     }
 }
 

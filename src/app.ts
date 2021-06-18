@@ -4,9 +4,9 @@ import path from 'path';
 import YAML from 'yamljs';
 import userRouter from './resources/users/user.router';
 import boardRouter from './resources/boards/board.router';
-import { requestLoggerMw } from './requestLogger';
-import errorHandler from './errorHandler';
-import logger from './Logger'
+import { requestLoggerMw } from './middleware/requestLogger';
+import errorHandler from './middleware/errorHandler';
+import logger from './utils/Logger';
 
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));

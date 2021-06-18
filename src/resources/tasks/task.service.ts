@@ -1,117 +1,84 @@
-import Task, { ITask } from './task.model';
-import MemoryDB from '../db/memory.db';
+import { Task } from '../../entities/Task';
+import { getRepository } from 'typeorm';
+import { BadRequestError, NotFoundError } from '../../middleware/errorHandler';
 
 /**
- * UserService class.
+ * TaskService class.
  * Task DB management.
  * @class
  */
-class TasksService {
-    private taskDB: MemoryDB<ITask>
-
+class TaskService {
     /**
-     * Create TaskService instance.
-     * @constructor
+     * get Repo
+     * @returns {Repository<Task>}
      */
-    constructor() {
-        this.taskDB = new MemoryDB();
+    get repo() {
+        return getRepository(Task)
     }
 
-    /**
-     * Create new Task and push to DB.
-     * @param {object} params - Represents new Task.
-     * @returns {Task} new created User instance.
+     /**
+     * Create new Task and add to DB.
+     * @async
+     * @param {Partial<Task>} dto - Task dto.
+     * @returns {Task} new created Task instance.
      */
-    createTask(params: { [key: string]: string }) {
-        const task = new Task(params);
-        this.taskDB.addItem(task);
-        return task;
+    async createTask(dto: Partial<Task>) {
+        try {
+            const task = this.repo.create(dto)
+            await task.save()
+            return task;
+        } catch {            
+            throw new BadRequestError('One of parameters missing');
+        }
     }
-
+    
     /**
      * Find Task By Id.
+     * @async
      * @param {string} id - Task id.
-     * @returns {(Task | null)} Task from db or null if not finded.
+     * @returns {Task} Task from db.
      */
-    findTaskById(id: string) {
-        const found = this.taskDB.getById(id);
-        if(!found) return null;
-        return found;
+    async findTaskById(id: string) {
+        const task = await this.repo.findOne(id)
+        if(!task) throw new NotFoundError(`Task with id - ${id} not found`)
+        return task;
     }
 
     /**
      * Get all tasks from DB.
-     * @returns {TAsk[]} Task Array.
+     * @async
+     * @returns {Task[]} Tasks Array.
      */
-    getAll() {
-        return this.taskDB.getAll();
+    async getAll() {
+        const tasks = await this.repo.find()
+        return tasks
     }
 
     /**
      * Delete Task by Id from DB.
+     * @async
      * @param {string} id Task id.
-     * @returns {(Task | null)} Returns deleted Task. if the Task was deleted and null if not.
+     * @returns {Task} Returns deleted Task.
      */
-    deleteTask(id: string) {
-        const deletedTask = this.taskDB.deleteItemById(id)
-        if(!deletedTask) return null;
-        return deletedTask;
-    }
-
-    /**
-     * Delete all tasks whose id equals boadrId.
-     * @param {string} boardId 
-     */
-    deleteByBoardId(boardId: string) {
-        let tasks = this.taskDB.getAll()
-        tasks = tasks.filter((task) => task.boardId === boardId)
-        this.taskDB.deleteItems(tasks);
-    }
-
-    /**
-     * Remove All Users From assignee.
-     * @param {string} userId 
-     */
-    removeUser(userId: string) {
-        const tasks = this.taskDB.getAll()
-        tasks.forEach((task) => {
-            if(task.userId && task.userId === userId) {
-                task.userId = null;
-            }
-        })
+    async deleteTask(id: string) {
+        const task = await this.repo.findOne(id)
+        if(!task) throw new NotFoundError(`Task with id - ${id} not found`)
+        await task.remove()
+        return task
     }
 
     /**
      * Updates Task with the specified id.
-     * @param {Task} task Object represents Task model 
-     * @returns {Task} updated Task
+     * @async
+     * @param {string} id Task id 
+     * @param {Partial<Task>} dto Object with filds to update.
+     * @returns {boolean} is Task been updated
      */
-    updateTask(id: string, {
-        title,
-        description,
-        userId,
-        order,
-        boardId,
-        columnId
-    }: {
-        title: string,
-        description: string,
-        userId: string,
-        order: string,
-        boardId: string,
-        columnId: string})
-    {
-        const task = this.taskDB.getById(id);
-        if(!task) return null;
-
-        if(title) task.title = title;
-        if(description) task.description = description;
-        if(userId) task.userId = userId;
-        if(order) task.order = order;
-        if(boardId) task.boardId = boardId;
-        if(columnId) task.columnId = columnId;
-        return task;
+    async updateTask(id: string, dto: Partial<Task>) {
+        const affected = (await this.repo.update(id, dto)).affected
+        if(!affected) throw new BadRequestError('To many parameters or id not found')
+        return true
     }
 }
 
-export default new TasksService()
+export default new TaskService()

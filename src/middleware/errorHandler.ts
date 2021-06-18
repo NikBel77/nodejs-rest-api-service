@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import Logger from './Logger'
+import Logger from '../utils/Logger'
 
 /**
  * Handle custom errors

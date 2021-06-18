@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { finished } from "stream";
-import logger from "./Logger";
+import logger from "../utils/Logger";
 
 /**
  * Logger log all requests to console

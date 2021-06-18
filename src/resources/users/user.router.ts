@@ -1,54 +1,39 @@
 import { Router } from 'express';
-import { BadRequestError, NotFoundError } from '../../errorHandler';
-import User from './user.model';
 import usersService from './user.service';
 import { StatusCodes } from 'http-status-codes';
+import routerFn from '../../utils/routerFn';
 
 const router = Router()
 
-// const routerFn = async (routeFn: RequestHandler) =>
-//     (req: Request, res: Response, next: NextFunction) => {
-//         try {
-//             routeFn(req, res, next)
-//         } catch (err) {
-//             next(err)
-//         }
-// }
+router.route('/').get(routerFn(async (_, res) => {
+    const users =  await usersService.getAll();
+    res.json(users);
+}));
 
-router.route('/').get(async (_, res) => {
-    const users =  usersService.getAll();
-    res.json(users.map(User.toResponse));
-});
+router.route('/').post(routerFn(async (req, res) => {
+    const user = await usersService.createUser(req.body);
+    res.status(StatusCodes.CREATED).json(user);
+}));
 
-router.route('/').post((req, res) => {
-    const { name, login, password } = req.body;
-    if(!User.validate(name, login, password)) throw new BadRequestError(
-        `invalid one of parameters: name: ${name}, login: ${login}, password: ${password}`
-    )
-    const user = usersService.createUser(name, login, password);
-    res.status(StatusCodes.CREATED).json(User.toResponse(user));
-});
-
-router.route('/:id').get((req, res) => {
+router.route('/:id').get(routerFn(async (req, res) => {
     const { id } = req.params;
-    const user = usersService.findUserById(id);
-    if(!user) throw new NotFoundError(`user with id: ${id} not found`)
-    res.json(User.toResponse(user))
-});
+    if (!id) throw new Error('id must be provided')
+    const user = await usersService.findUserById(id);
+    res.json(user)
+}));
 
-router.route('/:id').delete((req, res) => {
+router.route('/:id').delete(routerFn(async (req, res) => {
     const { id } = req.params;
-    const deletetUser = usersService.deleteUser(id)
-    if(!deletetUser) throw new NotFoundError(`user with id: ${id} not found`)
-    res.status(StatusCodes.NO_CONTENT).json(User.toResponse(deletetUser))
-});
+    if (!id) throw new Error('id must be provided')
+    const deletetUser = await usersService.deleteUser(id)
+    res.status(StatusCodes.NO_CONTENT).json(deletetUser)
+}));
 
-router.route('/:id').put((req, res) => {
+router.route('/:id').put(routerFn(async (req, res) => {
     const { id } = req.params;
-    const { name, login, password } = req.body
-    const updatedUser = usersService.updateUser(id, { name, login, password });
-    if(!updatedUser) throw new NotFoundError(`user with id: ${id} not found`)
-    res.json(User.toResponse(updatedUser))
-});
+    if (!id) throw new Error('id must be provided')
+    const isUpdated = await usersService.updateUser(id, req.body);
+    res.json({ updated: isUpdated })
+}));
 
 export default router;
