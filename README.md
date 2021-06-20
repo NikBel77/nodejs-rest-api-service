@@ -3,6 +3,7 @@
 ## Setup & run with Docker
 - install docker
 - pull 'docker' branch
+- create pgdata folder: `mkdir pgdata`
 - cmd `docker compose up`
 - `ctrl + c` to stop containers
 
