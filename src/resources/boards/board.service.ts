@@ -68,14 +68,14 @@ class BoardService {
      * Delete Board by Id from DB.
      * @async
      * @param {string} id Board id.
-     * @returns {Board} Returns deleted Board.
+     * @returns {boolean} Returns deleted Board.
      */
     async deleteBoard(id: string) {
         const board = await this.repo.findOne(id);
         if(!board) throw new NotFoundError(`Board with id - ${id} not found`);
         await board.remove();
         await taskService.removeWhereId(id)
-        return this.toResponce(board);
+        return true;
     }
 
     /**

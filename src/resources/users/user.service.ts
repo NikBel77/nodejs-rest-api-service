@@ -1,5 +1,6 @@
 import { User } from '../../entities/User';
 import { getRepository } from 'typeorm';
+import taskService from '../tasks/task.service';
 import { BadRequestError, NotFoundError } from '../../middleware/errorHandler';
 
 /**
@@ -65,8 +66,9 @@ class UsersService {
     async deleteUser(id: string) {
         const user = await this.repo.findOne(id)
         if(!user) throw new NotFoundError(`User with id - ${id} not found`)
-        await user.remove()
-        return this.toResponce(user);
+        await user.remove()        
+        await taskService.unassignUser(id)        
+        return this.toResponce(user)
     }
 
     /**

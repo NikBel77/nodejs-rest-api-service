@@ -68,13 +68,13 @@ class TaskService {
      * Delete Task by Id from DB.
      * @async
      * @param {string} id Task id.
-     * @returns {Task} Returns deleted Task.
+     * @returns {boolean} Returns deleted Task.
      */
     async deleteTask(id: string) {
         const task = await this.repo.findOne(id)
         if(!task) throw new NotFoundError(`Task with id - ${id} not found`)
         await task.remove()
-        return this.toResponce(task)
+        return true
     }
 
     /**
@@ -100,9 +100,15 @@ class TaskService {
         tasks.forEach(async (task) => await task.remove());
     }
 
+    /**
+     * Unassign deleted user
+     * @param userId 
+     */
     async unassignUser(userId: string) {
         const tasks = await this.repo.find({ where: { userId: userId }})
-        tasks.forEach(task => task.userId = null)
+        tasks.forEach(async (task) => {
+            await this.repo.update(task.id, { userId: null})
+        })
     }
 }
 

@@ -27,8 +27,8 @@ router.route('/:id').get(routerFn(async (req, res) => {
 router.route('/:id').delete(routerFn(async (req, res) => {
     const { id } = req.params;
     if (!id) throw new Error('id must be provided')
-    const deleted = await taskServise.deleteTask(id)
-    res.status(StatusCodes.NO_CONTENT).json(deleted)
+    const isDeleted = await taskServise.deleteTask(id)
+    res.status(StatusCodes.NO_CONTENT).json({ deleted: isDeleted })
 }));
 
 router.route('/:id').put(routerFn(async (req, res) => {

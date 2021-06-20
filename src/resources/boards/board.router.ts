@@ -27,7 +27,7 @@ router.route('/:id').delete(routerFn(async (req, res) => {
     const { id } = req.params;
     if (!id) throw new Error('id must be provided')
     const deleted = await boardService.deleteBoard(id)
-    res.status(StatusCodes.NO_CONTENT).json(deleted)
+    res.status(StatusCodes.NO_CONTENT).json({ deleted })
 }));
 
 router.route('/:id').put(routerFn(async (req, res) => {
