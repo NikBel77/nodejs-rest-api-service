@@ -16,17 +16,27 @@ class TaskService {
         return getRepository(Task)
     }
 
+    /**
+     * Task to responce
+     * @param task
+     * @returns 
+     */
+    toResponce = (task: Task) => ({
+        ...task, id: task.id.toString()
+    })
+
      /**
      * Create new Task and add to DB.
      * @async
      * @param {Partial<Task>} dto - Task dto.
      * @returns {Task} new created Task instance.
      */
-    async createTask(dto: Partial<Task>) {
+    async createTask(boardId: string, dto: Partial<Task>) {
         try {
-            const task = this.repo.create(dto)
+            const taskDto = { ...dto, boardId };
+            const task = this.repo.create(taskDto)
             await task.save()
-            return task;
+            return this.toResponce(task);
         } catch {            
             throw new BadRequestError('One of parameters missing');
         }
@@ -41,7 +51,7 @@ class TaskService {
     async findTaskById(id: string) {
         const task = await this.repo.findOne(id)
         if(!task) throw new NotFoundError(`Task with id - ${id} not found`)
-        return task;
+        return this.toResponce(task);
     }
 
     /**
@@ -51,7 +61,7 @@ class TaskService {
      */
     async getAll() {
         const tasks = await this.repo.find()
-        return tasks
+        return tasks.map(this.toResponce)
     }
 
     /**
@@ -64,7 +74,7 @@ class TaskService {
         const task = await this.repo.findOne(id)
         if(!task) throw new NotFoundError(`Task with id - ${id} not found`)
         await task.remove()
-        return task
+        return this.toResponce(task)
     }
 
     /**
@@ -78,6 +88,21 @@ class TaskService {
         const affected = (await this.repo.update(id, dto)).affected
         if(!affected) throw new BadRequestError('To many parameters or id not found')
         return true
+    }
+
+    /**
+     * Remove all task where board id
+     * @async
+     * @param boardId 
+     */
+    async removeWhereId(boardId: string) {
+        const tasks = await this.repo.find({ where: { boardId: boardId }})
+        tasks.forEach(async (task) => await task.remove());
+    }
+
+    async unassignUser(userId: string) {
+        const tasks = await this.repo.find({ where: { userId: userId }})
+        tasks.forEach(task => task.userId = null)
     }
 }
 

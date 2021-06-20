@@ -11,7 +11,9 @@ router.route('/').get(routerFn(async (_, res) => {
 }));
 
 router.route('/').post(routerFn(async (req, res) => {
-    const task = await taskServise.createTask(req.body);
+    const { boardId } = req.params;
+    if (!boardId) throw new Error('board id must be provided')
+    const task = await taskServise.createTask(boardId, req.body);
     res.status(StatusCodes.CREATED).json(task);
 }));
 

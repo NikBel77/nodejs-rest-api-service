@@ -1,4 +1,5 @@
 import { Board } from '../../entities/Board';
+import taskService from '../tasks/task.service';
 import { getRepository } from 'typeorm';
 import { BadRequestError, NotFoundError } from '../../middleware/errorHandler';
 
@@ -16,6 +17,15 @@ class BoardService {
         return getRepository(Board)
     }
 
+    /**
+     * Task to responce
+     * @param task
+     * @returns 
+     */
+    toResponce = (board: Board) => ({
+        ...board, id: board.id.toString()
+    })
+
      /**
      * Create new Board and add to DB.
      * @async
@@ -24,10 +34,9 @@ class BoardService {
      */
     async createBoard(dto: Partial<Board>) {
         try {
-            dto.columns = JSON.stringify(dto.columns)
             const board = this.repo.create(dto)
             await board.save()
-            return board;
+            return this.toResponce(board);
         } catch {            
             throw new BadRequestError('One of parameters missing');
         }
@@ -42,7 +51,7 @@ class BoardService {
     async findBoardById(id: string) {
         const board = await this.repo.findOne(id)
         if(!board) throw new NotFoundError(`Board with id - ${id} not found`)
-        return { ...board, columns: board.columns };
+        return this.toResponce(board);
     }
 
     /**
@@ -52,7 +61,7 @@ class BoardService {
      */
     async getAll() {
         const boards = await this.repo.find()
-        return boards
+        return boards.map(this.toResponce)
     }
 
     /**
@@ -62,10 +71,11 @@ class BoardService {
      * @returns {Board} Returns deleted Board.
      */
     async deleteBoard(id: string) {
-        const board = await this.repo.findOne(id)
-        if(!board) throw new NotFoundError(`Board with id - ${id} not found`)
-        await board.remove()
-        return board
+        const board = await this.repo.findOne(id);
+        if(!board) throw new NotFoundError(`Board with id - ${id} not found`);
+        await board.remove();
+        await taskService.removeWhereId(id)
+        return this.toResponce(board);
     }
 
     /**
@@ -73,11 +83,11 @@ class BoardService {
      * @async
      * @param {string} id Board id 
      * @param {Partial<Board>} dto Object with filds to update.
-     * @returns {boolean} is Board been updated
+     * @returns {boolean}
      */
     async updateBoard(id: string, dto: Partial<Board>) {
-        const affected = (await this.repo.update(id, dto)).affected
-        if(!affected) throw new BadRequestError('To many parameters or id not found')
+        const res = await this.repo.update(id, dto)
+        if(!res.affected) throw new BadRequestError('Wrong parameters')
         return true
     }
 }

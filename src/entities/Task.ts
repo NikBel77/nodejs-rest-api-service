@@ -7,7 +7,7 @@ export class Task extends BaseEntity {
     id!: number;
 
     @Column()
-    name!: string;
+    title!: string;
 
     @Column()
     description!: string;
@@ -15,13 +15,13 @@ export class Task extends BaseEntity {
     @Column()
     order!: number;
 
-    @Column()
-    userId!: number;
+    @Column({ type: 'varchar', nullable: true })
+    userId!: string | null;
 
-    @Column()
-    boardId!: number;
+    @Column({ type: 'varchar', nullable: true })
+    boardId!: string | null;
 
-    @Column()
-    columnId!: number;
+    @Column({ type: 'varchar', nullable: true })
+    columnId!: string | null;
 
 }

@@ -16,6 +16,8 @@ class UsersService {
         return getRepository(User)
     }
 
+    private toResponce = ({ name, id, login }: User) => ({ name, id, login })
+
      /**
      * Create new User and add to DB.
      * @async
@@ -26,7 +28,7 @@ class UsersService {
         try {
             const user = this.repo.create(dto)
             await user.save()
-            return user;
+            return this.toResponce(user);
         } catch {            
             throw new BadRequestError('One of parameters missing');
         }
@@ -41,7 +43,7 @@ class UsersService {
     async findUserById(id: string) {
         const user = await this.repo.findOne(id)
         if(!user) throw new NotFoundError(`User with id - ${id} not found`)
-        return user;
+        return this.toResponce(user);
     }
 
     /**
@@ -51,7 +53,7 @@ class UsersService {
      */
     async getAll() {
         const users = await this.repo.find()
-        return users
+        return users.map(this.toResponce)
     }
 
     /**
@@ -64,7 +66,7 @@ class UsersService {
         const user = await this.repo.findOne(id)
         if(!user) throw new NotFoundError(`User with id - ${id} not found`)
         await user.remove()
-        return user
+        return this.toResponce(user);
     }
 
     /**

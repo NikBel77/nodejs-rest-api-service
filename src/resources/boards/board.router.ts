@@ -12,8 +12,6 @@ router.route('/').get(routerFn(async (_, res) => {
 }));
 
 router.route('/').post(routerFn(async (req, res) => {
-    console.log('created')
-    
     const board = await boardService.createBoard(req.body);
     res.status(StatusCodes.CREATED).json(board);
 }));

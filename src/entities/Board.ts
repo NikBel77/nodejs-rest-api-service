@@ -1,16 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
+// import { ColumnEnt } from './Column';
 
-@Entity()
-export class Columns extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id!: number;
-
-    @Column()
-    title!: string;
-
-    @Column()
-    order!: number;
-
+interface IColumn {
+    title: string,
+    order: number,
 }
 
 @Entity()
@@ -22,7 +15,7 @@ export class Board extends BaseEntity {
     @Column()
     title!: string;
 
-    @Column()
-    columns!: string
+    @Column({ type: 'json' })
+    columns!: IColumn;
 
 }
