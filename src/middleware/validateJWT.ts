@@ -6,7 +6,6 @@ import config from '../common/config'
 import { UnauthorizedError } from './errorHandler'
 import whiteList from '../common/JWTwhitelist'
 const secret = config.JWT_SECRET_KEY!
-if (secret === undefined) throw new Error('jwt secret key must be provided in .env file')
 
 export default async function (req: Request, _res: Response, next: NextFunction): Promise<void> {
     if (whiteList.some(({ url, method }) => (url === req.url && method === req.method))) {
