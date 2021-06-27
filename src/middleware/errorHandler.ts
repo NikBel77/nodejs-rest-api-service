@@ -10,14 +10,16 @@ import Logger from '../utils/Logger'
  * @param {NextFunction} next 
  */
 export default function errorHandler(
-    err: Error, req: Request, res: Response, _next: NextFunction
+    err: IRequestError, req: Request, res: Response, _next: NextFunction
 ): void {
     const { url , method } = req
-    if (!(err instanceof NotFoundError) && !(err instanceof BadRequestError)) {
+    
+    if (!err.statusCode) {
         res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR)
         Logger.writeError(StatusCodes.INTERNAL_SERVER_ERROR, method, url)
         return
     }
+
     const { message, statusCode } = err
     res.status(statusCode).json({ message })
     Logger.writeError(statusCode, method, url)
@@ -33,4 +35,12 @@ export class NotFoundError extends Error implements IRequestError {
 
 export class BadRequestError extends Error implements IRequestError {
     public statusCode = StatusCodes.BAD_REQUEST
+}
+
+export class UnauthorizedError extends Error implements IRequestError {
+    public statusCode = StatusCodes.UNAUTHORIZED
+}
+
+export class ForbiddenError extends Error implements IRequestError {
+    public statusCode = StatusCodes.FORBIDDEN
 }
