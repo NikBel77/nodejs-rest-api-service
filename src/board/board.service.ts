@@ -5,6 +5,7 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 @Injectable()
 export class BoardService {
   create(createBoardDto: CreateBoardDto) {
+    console.log(createBoardDto);
     return 'This action adds a new board';
   }
 
@@ -17,6 +18,7 @@ export class BoardService {
   }
 
   update(id: number, updateBoardDto: UpdateBoardDto) {
+    console.log(updateBoardDto);
     return `This action updates a #${id} board`;
   }
 
