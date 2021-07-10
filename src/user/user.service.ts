@@ -1,28 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    console.log(createUserDto);
-    return 'This action adds a new user';
+  constructor(
+    @InjectRepository(User)
+    private userRepo: Repository<User>,
+  ) {}
+
+  private toResponce = ({ name, id, login }: User) => ({ name, id, login });
+
+  async create(createUserDto: CreateUserDto) {
+    const user = this.userRepo.create(createUserDto);
+    await user.save();
+    return this.toResponce(user);
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll() {
+    const users = await this.userRepo.find();
+    return users.map(this.toResponce);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    const user = await this.userRepo.findOne(id);
+    if (!user) throw new NotFoundException(`User with id - ${id} not found`);
+    return this.toResponce(user);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    console.log(updateUserDto);
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const affected = (await this.userRepo.update(id, updateUserDto)).affected;
+    if (!affected)
+      throw new BadRequestException('To many parameters or id not found');
+    return { text: 'Updated', id };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    const user = await this.userRepo.findOne(id);
+    if (!user) throw new NotFoundException(`User with id - ${id} not found`);
+    await user.remove();
+    // await taskService.unassignUser(id);
+    return this.toResponce(user);
   }
 }

@@ -5,6 +5,9 @@ import { UserModule } from './user/user.module';
 import { BoardModule } from './board/board.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TaskModule } from './task/task.module';
+import { User } from './user/entities/user.entity';
+import { Task } from './task/entities/task.entity';
+import { Board } from './board/entities/board.entity';
 
 @Module({
   imports: [
@@ -15,7 +18,7 @@ import { TaskModule } from './task/task.module';
       username: 'postgres',
       password: '4515',
       database: 'node_nest',
-      entities: [],
+      entities: [User, Task, Board],
       synchronize: true,
     }),
     UserModule,
