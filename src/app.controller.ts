@@ -10,6 +10,7 @@ export class AppController {
     @Body() { login, password }: { login: string; password: string },
   ) {
     const user = await this.authService.validateUser(login, password);
-    return this.authService.login(user);
+    const res = await this.authService.login(user);
+    return res;
   }
 }
