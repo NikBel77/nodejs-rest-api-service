@@ -8,16 +8,18 @@ import { TaskModule } from './task/task.module';
 import { User } from './user/entities/user.entity';
 import { Task } from './task/entities/task.entity';
 import { Board } from './board/entities/board.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: '4515',
-      database: 'node_nest',
+      host: process.env['POSTGRES_HOST'],
+      port: Number(process.env['POSTGRES_PORT']),
+      username: process.env['POSTGRES_USER'],
+      password: process.env['POSTGRES_PASSWORD'],
+      database: process.env['POSTGRES_DB'],
       entities: [User, Task, Board],
       synchronize: true,
     }),
