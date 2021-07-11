@@ -8,12 +8,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { TaskService } from 'src/task/task.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepo: Repository<User>,
+    private taskService: TaskService,
   ) {}
 
   private toResponce = ({ name, id, login }: User) => ({ name, id, login });
@@ -39,14 +41,14 @@ export class UserService {
     const affected = (await this.userRepo.update(id, updateUserDto)).affected;
     if (!affected)
       throw new BadRequestException('To many parameters or id not found');
-    return { text: 'Updated', id };
+    return { message: 'Updated', id };
   }
 
   async remove(id: string) {
     const user = await this.userRepo.findOne(id);
     if (!user) throw new NotFoundException(`User with id - ${id} not found`);
     await user.remove();
-    // await taskService.unassignUser(id);
+    await this.taskService.unassignUser(id);
     return this.toResponce(user);
   }
 }

@@ -1,10 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
 
-interface IColumn {
-  title: string;
-  order: number;
-}
-
 @Entity()
 export class Board extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -14,5 +9,5 @@ export class Board extends BaseEntity {
   title!: string;
 
   @Column({ type: 'json' })
-  columns!: IColumn;
+  columns!: { [key: string]: string };
 }
