@@ -1,0 +1,54 @@
+config:
+  target: "http://localhost:4000"
+  phases:
+    - duration: 200
+      arrivalRate: 5
+      name: loadtest
+
+scenarios:
+  - flow:
+    - post:
+        url: "/login"
+        json:
+          login: "admin"
+          password: "admin"
+        capture:
+          json: "$.token"
+          as: "token"
+    - post:
+        url: "/users"
+        json:
+          name: "testUser"
+          login: "testUser"
+          password: "test"
+        headers:
+          Authorization: Bearer {{ token }}
+          Content-Type: application/json
+        capture:
+          - json: "$.id"
+            as: "id"
+    - get:
+        url: "/users"
+        headers:
+          Authorization: Bearer {{ token }}
+          Content-Type: application/json
+    - think: 5
+    - get:
+        url: "/users/{{ id }}"
+        headers:
+          Authorization: Bearer {{ token }}
+          Content-Type: application/json
+    - put:
+        url: "/users/{{ id }}"
+        json:
+          name: "testUser2"
+          login: "testUser2"
+          password: "test2"
+        headers:
+          Authorization: Bearer {{ token }}
+          Content-Type: application/json
+    - delete:
+        url: "/users/{{ id }}"
+        headers:
+          Authorization: Bearer {{ token }}
+          Content-Type: application/json

@@ -1,5 +1,24 @@
 # RS School REST service
 
+## Setup & run with Docker
+- install docker
+- pull 'docker' branch
+- create pgdata folder: `mkdir pgdata`
+- cmd `docker compose up`
+- `ctrl + c` to stop containers
+
+Logs will be written to the log folder
+
+## auth testing
+- up docker compose
+- connect to docker postgres via pgAdmin
+- open Query tool and create new Admin user `insert into public.user(name, login, password) values ('admin', 'admin', '$2a$10$/x6bfmHW5kxNSlcqOYF5G.Ia0FPFB4RALIK9d83pc1qny70TJCUoO')`
+
+the second way to create a new user -
+uncomment the line with the route / users and the post method in /common/JWTwhitelist.ts.
+then create a user with a swagger or postman,
+then comment out the route back
+
 ## Prerequisites
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
