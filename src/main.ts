@@ -5,11 +5,13 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import { AppLogger } from './logger';
 
 async function bootstrap() {
   const fastify = process.env['USE_FASTIFY'] === 'true';
   console.log('framework: ', fastify ? 'fastify' : 'express');
 
+  const logger = new AppLogger();
   let app;
   const port = Number(process.env['PORT']);
 
@@ -22,7 +24,7 @@ async function bootstrap() {
     );
   } else {
     app = await NestFactory.create(AppModule, {
-      logger: ['error', 'warn'],
+      logger,
     });
     app.useGlobalFilters(new HttpExceptionFilter());
   }
